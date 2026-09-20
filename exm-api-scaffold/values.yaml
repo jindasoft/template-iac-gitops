@@ -1,0 +1,63 @@
+info:
+  name: &app-name exm-api-scaffold
+  namespace: exm-apins-dev
+  image: ghcr.io/example/exm-api-scaffold
+  tag: sha-xxxxxxx
+  imagePullSecrets: dockerconfigjson-github-com
+  replicas: 1
+  port: 80
+  targetPort: 9000
+  healthLiveness: /liveness
+  healthReadiness: /readiness
+
+resources:
+  requests:
+    cpu: 20m
+    memory: 128Mi
+  limits:
+    cpu: 50m
+    memory: 256Mi
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: cloud.google.com/gke-spot
+              operator: In
+              values:
+                - "true"
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - *app-name
+          topologyKey: kubernetes.io/hostname
+
+tolerations:
+  - key: "cloud.google.com/gke-spot"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+extraEnv:
+  APPROLE_ROLE_ID: "41b5a901-60c6-e413-5b73-6e9fd35df676"
+  APPROLE_SECRET_ID: "046a89f1-a8fc-88e6-eae9-c7b713985ce4"
+
+  CONFIG_APP__NAME: *app-name
+  CONFIG_APP__KV_NAME: exm-api-dev
+  CONFIG_APP__ENV: dev
+  CONFIG_APP__PORT: 9000
+  CONFIG_SERVER__PRETTY_PRINT: true
+  CONFIG_SERVER__LOG_LEVEL: "debug"
+  CONFIG_SERVER__IDLE_TIMEOUT: "1m"
+  CONFIG_SERVER__READ_TIMEOUT: "1m"
+  CONFIG_SERVER__WRITE_TIMEOUT: "1m"
+
+  CONFIG_SERVICE__DEBUG: true
+  CONFIG_SERVICE__VAULT_URL: "http://vault-dev.vault-nonprod.svc.cluster.local:8200"
