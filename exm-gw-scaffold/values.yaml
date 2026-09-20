@@ -51,7 +51,7 @@ ingress:
   certManager: letsencrypt
 
 vaultAgent:
-  imageTag: hashicorp/vault:1.21.0
+  imageTag: hashicorp/vault:2.1.1
   secretPath: exm-gw-dev/data/exm-gw-scaffold
   mountPath: /etc/krakend/config
   filename: jwk.json
