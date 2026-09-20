@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ .Values.info.name }}-vault-agent-config
+  namespace: {{ .Values.info.namespace }}
+  
+data:
+  vault-agent-config.hcl: |
+    exit_after_auth = false
+    pid_file = "/tmp/vault-agent.pid"
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "{{ .Values.vaultAgent.role }}"
+        }
+      }
+      sink "file" {
+        config = {
+          path = "/home/vault/.vault-token"
+        }
+      }
+    }
+    template {
+      source      = "/vault/templates/jwk.tpl"
+      destination = "{{ .Values.vaultAgent.mountPath }}/{{ .Values.vaultAgent.filename }}"
+    }
+    vault {
+      address = "{{ .Values.vaultAgent.url }}"
+    }
+  jwk.tpl: |
+    {{`{{- with secret "`}}{{ .Values.vaultAgent.secretPath }}{{`" -}}`}}
+    {{`{{ .Data.data | toJSON }}`}}
+    {{`{{- end }}`}}

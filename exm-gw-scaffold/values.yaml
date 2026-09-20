@@ -1,22 +1,21 @@
 info:
-  env: dev
-  name: &app-name web-example
-  namespace: examplensweb-dev
-  image: ghcr.io/tripgator/web-example
+  name: &app-name exm-gw-scaffold
+  namespace: exm-gwns-dev
+  image: ghcr.io/example/exm-gw-scaffold
   tag: sha-xxxxxxx
   imagePullSecrets: dockerconfigjson-github-com
   replicas: 1
   port: 80
-  targetPort: 3000
-  healthLiveness: /
-  healthReadiness: /
+  targetPort: 8080
+  healthLiveness: /__health
+  healthReadiness: /__health
 
 resources:
   requests:
-    cpu: 50m
+    cpu: 20m
     memory: 128Mi
   limits:
-    cpu: 100m
+    cpu: 50m
     memory: 256Mi
 
 affinity:
@@ -47,9 +46,21 @@ tolerations:
     effect: "NoSchedule"
 
 ingress:
-  host: web-dev.example.dev
+  host: api-dev.example.com
   path: /
   certManager: letsencrypt
 
-extraEnv:
-  NODE_ENV: dev
+vaultAgent:
+  imageTag: hashicorp/vault:1.21.0
+  secretPath: exm-gw-dev/data/exm-gw-scaffold
+  mountPath: /etc/krakend/config
+  filename: jwk.json
+  role: exm-gw-scaffold-role-dev
+  url: http://vault-dev.vault-nonprod.svc.cluster.local:8200
+  resources:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 128Mi
