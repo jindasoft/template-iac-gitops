@@ -1,0 +1,55 @@
+info:
+  env: dev
+  name: &app-name web-example
+  namespace: examplensweb-dev
+  image: ghcr.io/tripgator/web-example
+  tag: sha-xxxxxxx
+  imagePullSecrets: dockerconfigjson-github-com
+  replicas: 1
+  port: 80
+  targetPort: 3000
+  healthLiveness: /
+  healthReadiness: /
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 256Mi
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: cloud.google.com/gke-spot
+              operator: In
+              values:
+                - "true"
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - *app-name
+          topologyKey: kubernetes.io/hostname
+
+tolerations:
+  - key: "cloud.google.com/gke-spot"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+ingress:
+  host: web-dev.example.dev
+  path: /
+  certManager: letsencrypt
+
+extraEnv:
+  NODE_ENV: dev

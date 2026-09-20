@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Values.info.name }}
+  namespace: {{ .Values.info.namespace }}  
+  labels:
+    app: {{ .Values.info.name }}
+
+spec:
+  replicas: {{ .Values.info.replicas }}
+
+  selector:
+    matchLabels:
+      app: {{ .Values.info.name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.info.name }}
+
+    spec:
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+
+      imagePullSecrets:
+        - name: {{ .Values.info.imagePullSecrets }} 
+
+      containers:
+        - name: {{ .Values.info.name }}
+          image: {{ .Values.info.image }}:{{ .Values.info.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.info.targetPort }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.info.healthLiveness }}
+              port: {{ .Values.info.targetPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.info.healthReadiness }}
+              port: {{ .Values.info.targetPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+        
+          {{- if .Values.extraEnv }}
+          env:
+            {{- range $key, $value := .Values.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
