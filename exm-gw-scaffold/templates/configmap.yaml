@@ -30,6 +30,6 @@ data:
       address = "{{ .Values.vaultAgent.url }}"
     }
   jwk.tpl: |
-    {{`{{- with secret "`}}{{ .Values.vaultAgent.secretPath }}{{`" -}}`}}
-    {{`{{ .Data.data | toJSON }}`}}
-    {{`{{- end }}`}}
+    {{ `{{- with secret "` }}{{ .Values.vaultAgent.secretPath }}{{ `" -}}` }}
+    {{ `{{ .Data.data | toJSON }}` }}
+    {{ `{{- end }}` }}
