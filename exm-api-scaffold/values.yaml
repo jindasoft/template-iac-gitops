@@ -14,9 +14,11 @@ resources:
   requests:
     cpu: 20m
     memory: 128Mi
+    ephemeral-storage: 256Mi
   limits:
     cpu: 50m
     memory: 256Mi
+    ephemeral-storage: 512Mi
 
 affinity:
   nodeAffinity:
@@ -47,7 +49,6 @@ tolerations:
 
 extraEnv:
   APPROLE_ROLE_ID: "41b5a901-60c6-e413-5b73-6e9fd35df676"
-  APPROLE_SECRET_ID: "046a89f1-a8fc-88e6-eae9-c7b713985ce4"
 
   CONFIG_APP__NAME: *app-name
   CONFIG_APP__KV_NAME: exm-api-dev
@@ -61,3 +62,7 @@ extraEnv:
 
   CONFIG_SERVICE__DEBUG: true
   CONFIG_SERVICE__VAULT_URL: "http://vault-dev.vault-nonprod.svc.cluster.local:8200"
+
+vaultAppRoleSecret:
+  name: exm-api-scaffold-vault-approle
+  key: secret-id

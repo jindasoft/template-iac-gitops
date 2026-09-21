@@ -20,6 +20,8 @@ spec:
         app: {{ .Values.info.name }}
 
     spec:
+      automountServiceAccountToken: false
+      
       {{- if .Values.affinity }}
       affinity:
         {{- toYaml .Values.affinity | nindent 8 }}
@@ -67,6 +69,11 @@ spec:
                 - ALL
           {{- if .Values.extraEnv }}
           env:
+            - name: APPROLE_SECRET_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.vaultAppRoleSecret.name }}
+                  key: {{ .Values.vaultAppRoleSecret.key }}
             {{- range $key, $value := .Values.extraEnv }}
             - name: {{ $key }}
               value: {{ $value | quote }}
