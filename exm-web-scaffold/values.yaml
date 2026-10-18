@@ -1,7 +1,7 @@
 info:
   env: dev
   name: &app-name exm-web-scaffold
-  namespace: exm-webns-dev
+  namespace: exm-web-dev-ns
   image: ghcr.io/example/exm-web-scaffold
   tag: sha-xxxxxxx
   imagePullSecrets: dockerconfigjson-github-com
@@ -54,4 +54,4 @@ ingress:
   certManager: letsencrypt
 
 extraEnv:
-  NODE_ENV: dev
+  NODE_ENV: development

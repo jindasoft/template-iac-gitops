@@ -1,6 +1,6 @@
 info:
   name: &app-name exm-api-scaffold
-  namespace: exm-apins-dev
+  namespace: exm-api-dev-ns
   image: ghcr.io/example/exm-api-scaffold
   tag: sha-xxxxxxx
   imagePullSecrets: dockerconfigjson-github-com
@@ -51,7 +51,7 @@ extraEnv:
   APPROLE_ROLE_ID: "41b5a901-60c6-e413-5b73-6e9fd35df676"
 
   CONFIG_APP__NAME: *app-name
-  CONFIG_APP__KV_NAME: exm-api-dev
+  CONFIG_APP__KV_NAME: exm-api-dev-vault
   CONFIG_APP__ENV: dev
   CONFIG_APP__PORT: 9000
   CONFIG_SERVER__PRETTY_PRINT: true
@@ -64,5 +64,5 @@ extraEnv:
   CONFIG_SERVICE__VAULT_URL: "http://vault-dev.vault-nonprod.svc.cluster.local:8200"
 
 vaultAppRoleSecret:
-  name: exm-api-scaffold-vault-approle
+  name: exm-api-vault-approle
   key: secret-id
