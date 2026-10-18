@@ -1,6 +1,6 @@
 info:
   name: &app-name exm-gw-scaffold
-  namespace: exm-gwns-dev
+  namespace: exm-gw-dev-ns
   image: ghcr.io/example/exm-gw-scaffold
   tag: sha-xxxxxxx
   imagePullSecrets: dockerconfigjson-github-com
